@@ -1,1 +1,90 @@
-function runPriorityScheduler(inputProcesses) {    let processes = inputProcesses.map(p => new Process(p.id, p.at, p.bt, p.priority));    let currentTime = 0;    let completed = 0;    let timeline = [];    let n = processes.length;    let currentProcess = null;    let lastSwitchTime = 0;    while (completed < n) {        let available = processes.filter(p => p.at <= currentTime && p.rem > 0);        if (available.length > 0) {            available.sort((a, b) => {                if (a.priority !== b.priority) return a.priority - b.priority;                if (a.at !== b.at) return a.at - b.at;                return a.id.localeCompare(b.id);            });            let best = available[0];            if (currentProcess !== best) {                if (currentProcess) {                    timeline.push({ id: currentProcess.id, start: lastSwitchTime, end: currentTime });                } else if (currentTime > lastSwitchTime) {                    timeline.push({ id: 'IDLE', start: lastSwitchTime, end: currentTime });                }                currentProcess = best;                lastSwitchTime = currentTime;                if (currentProcess.firstTime === -1) {                    currentProcess.firstTime = currentTime;                    currentProcess.rt = currentProcess.firstTime - currentProcess.at;                }            }            currentProcess.rem--;            currentTime++;            if (currentProcess.rem === 0) {                timeline.push({ id: currentProcess.id, start: lastSwitchTime, end: currentTime });                currentProcess.ct = currentTime;                currentProcess.tat = currentProcess.ct - currentProcess.at;                currentProcess.wt = currentProcess.tat - currentProcess.bt;                completed++;                currentProcess = null;                lastSwitchTime = currentTime;            }        } else {            if (currentProcess) {                timeline.push({ id: currentProcess.id, start: lastSwitchTime, end: currentTime });                currentProcess = null;                lastSwitchTime = currentTime;            }            let nextArrival = Math.min(...processes.filter(p => p.rem > 0).map(p => p.at));            if (nextArrival > currentTime) {                currentTime = nextArrival;            } else {                currentTime++;            }        }    }    let cleanTimeline = [];    if (timeline.length > 0) {        cleanTimeline.push(timeline[0]);        for (let j = 1; j < timeline.length; j++) {            let last = cleanTimeline[cleanTimeline.length - 1];            let curr = timeline[j];            if (last.id === curr.id && last.end === curr.start) {                last.end = curr.end;            } else {                cleanTimeline.push(curr);            }        }    }    return { processes, timeline: cleanTimeline };}
+function runPriorityScheduler(inputProcesses) {
+  let processes = inputProcesses.map(
+    (p) => new Process(p.id, p.at, p.bt, p.priority),
+  );
+  let currentTime = 0;
+  let completed = 0;
+  let timeline = [];
+  let n = processes.length;
+  let currentProcess = null;
+  let lastSwitchTime = 0;
+  while (completed < n) {
+    let available = processes.filter((p) => p.at <= currentTime && p.rem > 0);
+    if (available.length > 0) {
+      available.sort((a, b) => {
+        if (a.priority !== b.priority) return a.priority - b.priority;
+        if (a.at !== b.at) return a.at - b.at;
+        return a.id.localeCompare(b.id);
+      });
+      let best = available[0];
+      if (currentProcess !== best) {
+        if (currentProcess) {
+          timeline.push({
+            id: currentProcess.id,
+            start: lastSwitchTime,
+            end: currentTime,
+          });
+        } else if (currentTime > lastSwitchTime) {
+          timeline.push({
+            id: "IDLE",
+            start: lastSwitchTime,
+            end: currentTime,
+          });
+        }
+        currentProcess = best;
+        lastSwitchTime = currentTime;
+        if (currentProcess.firstTime === -1) {
+          currentProcess.firstTime = currentTime;
+          currentProcess.rt = currentProcess.firstTime - currentProcess.at;
+        }
+      }
+      currentProcess.rem--;
+      currentTime++;
+      if (currentProcess.rem === 0) {
+        timeline.push({
+          id: currentProcess.id,
+          start: lastSwitchTime,
+          end: currentTime,
+        });
+        currentProcess.ct = currentTime;
+        currentProcess.tat = currentProcess.ct - currentProcess.at;
+        currentProcess.wt = currentProcess.tat - currentProcess.bt;
+        completed++;
+        currentProcess = null;
+        lastSwitchTime = currentTime;
+      }
+    } else {
+      if (currentProcess) {
+        timeline.push({
+          id: currentProcess.id,
+          start: lastSwitchTime,
+          end: currentTime,
+        });
+        currentProcess = null;
+        lastSwitchTime = currentTime;
+      }
+      let nextArrival = Math.min(
+        ...processes.filter((p) => p.rem > 0).map((p) => p.at),
+      );
+      if (nextArrival > currentTime) {
+        currentTime = nextArrival;
+      } else {
+        currentTime++;
+      }
+    }
+  }
+  let cleanTimeline = [];
+  if (timeline.length > 0) {
+    cleanTimeline.push(timeline[0]);
+    for (let j = 1; j < timeline.length; j++) {
+      let last = cleanTimeline[cleanTimeline.length - 1];
+      let curr = timeline[j];
+      if (last.id === curr.id && last.end === curr.start) {
+        last.end = curr.end;
+      } else {
+        cleanTimeline.push(curr);
+      }
+    }
+  }
+  return { processes, timeline: cleanTimeline };
+}

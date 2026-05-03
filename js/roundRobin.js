@@ -1,1 +1,54 @@
-function runRoundRobin(inputProcesses, quantum) {    let processes = inputProcesses.map(p => new Process(p.id, p.at, p.bt, p.priority));    let readyQueue = [];    let currentTime = 0;    let completed = 0;    let timeline = [];    let n = processes.length;    processes.sort((a, b) => a.at - b.at);    let i = 0;    while (i < n && processes[i].at <= currentTime) {        readyQueue.push(processes[i]);        i++;    }    while (completed < n) {        if (readyQueue.length > 0) {            let p = readyQueue.shift();            if (p.firstTime === -1) {                p.firstTime = currentTime;                p.rt = p.firstTime - p.at;            }            let execTime = Math.min(p.rem, quantum);            timeline.push({ id: p.id, start: currentTime, end: currentTime + execTime });            p.rem -= execTime;            currentTime += execTime;            while (i < n && processes[i].at <= currentTime) {                readyQueue.push(processes[i]);                i++;            }            if (p.rem > 0) {                readyQueue.push(p);            } else {                p.ct = currentTime;                p.tat = p.ct - p.at;                p.wt = p.tat - p.bt;                completed++;            }        } else {            let idleStart = currentTime;            currentTime = processes[i].at;            timeline.push({ id: 'IDLE', start: idleStart, end: currentTime });            while (i < n && processes[i].at <= currentTime) {                readyQueue.push(processes[i]);                i++;            }        }    }    return { processes, timeline };}
+function runRoundRobin(inputProcesses, quantum) {
+  let processes = inputProcesses.map(
+    (p) => new Process(p.id, p.at, p.bt, p.priority),
+  );
+  let readyQueue = [];
+  let currentTime = 0;
+  let completed = 0;
+  let timeline = [];
+  let n = processes.length;
+  processes.sort((a, b) => a.at - b.at);
+  let i = 0;
+  while (i < n && processes[i].at <= currentTime) {
+    readyQueue.push(processes[i]);
+    i++;
+  }
+  while (completed < n) {
+    if (readyQueue.length > 0) {
+      let p = readyQueue.shift();
+      if (p.firstTime === -1) {
+        p.firstTime = currentTime;
+        p.rt = p.firstTime - p.at;
+      }
+      let execTime = Math.min(p.rem, quantum);
+      timeline.push({
+        id: p.id,
+        start: currentTime,
+        end: currentTime + execTime,
+      });
+      p.rem -= execTime;
+      currentTime += execTime;
+      while (i < n && processes[i].at <= currentTime) {
+        readyQueue.push(processes[i]);
+        i++;
+      }
+      if (p.rem > 0) {
+        readyQueue.push(p);
+      } else {
+        p.ct = currentTime;
+        p.tat = p.ct - p.at;
+        p.wt = p.tat - p.bt;
+        completed++;
+      }
+    } else {
+      let idleStart = currentTime;
+      currentTime = processes[i].at;
+      timeline.push({ id: "IDLE", start: idleStart, end: currentTime });
+      while (i < n && processes[i].at <= currentTime) {
+        readyQueue.push(processes[i]);
+        i++;
+      }
+    }
+  }
+  return { processes, timeline };
+}

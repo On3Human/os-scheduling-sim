@@ -1,1 +1,12 @@
-function Process(id, at, bt, priority) {    this.id = id;    this.at = parseInt(at);    this.bt = parseInt(bt);    this.priority = parseInt(priority);    this.rem = this.bt;    this.ct = 0;    this.wt = 0;    this.tat = 0;    this.rt = -1;    this.firstTime = -1;}
+function Process(id, at, bt, priority) {
+  this.id = id;
+  this.at = parseInt(at);
+  this.bt = parseInt(bt);
+  this.priority = parseInt(priority);
+  this.rem = this.bt;
+  this.ct = 0;
+  this.wt = 0;
+  this.tat = 0;
+  this.rt = -1;
+  this.firstTime = -1;
+}
