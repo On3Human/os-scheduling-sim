@@ -49,8 +49,8 @@ function getInputs() {
       showError(`Invalid Burst Time for ${id}. Must be > 0.`);
       return null;
     }
-    if (priority === "" || isNaN(priority)) {
-      showError(`Invalid Priority for ${id}.`);
+    if (priority === "" || isNaN(priority) || parseInt(priority) < 0) {
+      showError(`Invalid Priority for ${id}. Must be a non-negative integer.`);
       return null;
     }
     processes.push({
@@ -86,23 +86,32 @@ function fillResultTable(tableId, data) {
   });
   const avgRow = document.createElement("tr");
   const n = data.processes.length;
-  avgRow.innerHTML = `        <td><strong>Average</strong></td>        <td><strong>${(totalWT / n).toFixed(2)}</strong></td>        <td><strong>${(totalTAT / n).toFixed(2)}</strong></td>        <td><strong>${(totalRT / n).toFixed(2)}</strong></td>    `;
+  avgRow.innerHTML = `        <td>Average</td>        <td>${(totalWT / n).toFixed(2)}</td>        <td>${(totalTAT / n).toFixed(2)}</td>        <td>${(totalRT / n).toFixed(2)}</td>    `;
   tbody.appendChild(avgRow);
 }
 function displayComparison(rr, ps, np) {
   const compText = document.getElementById("comparison-text");
   const concText = document.getElementById("conclusion-text");
   const n = rr.processes.length;
+
   const rrAvgWT = rr.processes.reduce((a, b) => a + b.wt, 0) / n;
   const psAvgWT = ps.processes.reduce((a, b) => a + b.wt, 0) / n;
   const npAvgWT = np.processes.reduce((a, b) => a + b.wt, 0) / n;
+
   const rrAvgTAT = rr.processes.reduce((a, b) => a + b.tat, 0) / n;
   const psAvgTAT = ps.processes.reduce((a, b) => a + b.tat, 0) / n;
   const npAvgTAT = np.processes.reduce((a, b) => a + b.tat, 0) / n;
+
   const rrAvgRT = rr.processes.reduce((a, b) => a + b.rt, 0) / n;
   const psAvgRT = ps.processes.reduce((a, b) => a + b.rt, 0) / n;
   const npAvgRT = np.processes.reduce((a, b) => a + b.rt, 0) / n;
-  compText.innerHTML = `        <p><strong>Round Robin:</strong> Avg WT = ${rrAvgWT.toFixed(2)}, Avg TAT = ${rrAvgTAT.toFixed(2)}, Avg RT = ${rrAvgRT.toFixed(2)}</p>        <p><strong>Priority (Preemptive):</strong> Avg WT = ${psAvgWT.toFixed(2)}, Avg TAT = ${psAvgTAT.toFixed(2)}, Avg RT = ${psAvgRT.toFixed(2)}</p>        <p><strong>Priority (Non-Preemptive):</strong> Avg WT = ${npAvgWT.toFixed(2)}, Avg TAT = ${npAvgTAT.toFixed(2)}, Avg RT = ${npAvgRT.toFixed(2)}</p>    `;
+
+  compText.innerHTML = `
+        <p>Round Robin: Avg WT = ${rrAvgWT.toFixed(2)}, Avg TAT = ${rrAvgTAT.toFixed(2)}, Avg RT = ${rrAvgRT.toFixed(2)}</p>
+        <p>Priority (Preemptive): Avg WT = ${psAvgWT.toFixed(2)}, Avg TAT = ${psAvgTAT.toFixed(2)}, Avg RT = ${psAvgRT.toFixed(2)}</p>
+        <p>Priority (Non-Preemptive): Avg WT = ${npAvgWT.toFixed(2)}, Avg TAT = ${npAvgTAT.toFixed(2)}, Avg RT = ${npAvgRT.toFixed(2)}</p>
+    `;
+
   let best = "Round Robin";
   let minWT = rrAvgWT;
   if (psAvgWT < minWT) {
@@ -113,5 +122,32 @@ function displayComparison(rr, ps, np) {
     minWT = npAvgWT;
     best = "Priority (Non-Preemptive)";
   }
-  concText.innerText = `Conclusion: ${best} performed best in terms of average waiting time for this input.`;
+
+  const highPriorityP = ps.processes.reduce((prev, curr) =>
+    prev.priority < curr.priority ? prev : curr,
+  );
+  const highPriorityP_RR = rr.processes.find((p) => p.id === highPriorityP.id);
+  const urgentImproved =
+    highPriorityP.wt < highPriorityP_RR.wt
+      ? "Yes, Priority-based scheduling reduced waiting time for the highest priority process."
+      : "In this case, Priority-based scheduling did not significantly improve urgent task treatment compared to Round Robin.";
+
+  const fairness =
+    "Round Robin improved fairness by ensuring every process received a regular time slice.";
+
+  const maxWT_PS = Math.max(...ps.processes.map((p) => p.wt));
+  const starvation =
+    maxWT_PS > psAvgWT * 1.5
+      ? "Yes, starvation risk appeared for low-priority processes."
+      : "No significant starvation risk was observed.";
+
+  concText.innerHTML = `
+        <h3>Final Conclusion</h3>
+        <ul>
+            <li>Algorithm Performance: ${best} performed better on the selected dataset in terms of average waiting time.</li>
+            <li>Urgent Task Treatment: ${urgentImproved}</li>
+            <li>Fairness: ${fairness}</li>
+            <li>Starvation Risk: ${starvation}</li>
+        </ul>
+    `;
 }
