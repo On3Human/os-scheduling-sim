@@ -270,15 +270,13 @@ function displayComparison(rr, np) {
   const urgencyAdvantage = highestPriority.rt < hpRR.rt;
 
   summaryCard.innerHTML = `
-    <h3>Comparison Summary</h3>
     <ul>
-      <li><span class="icon ${npAvgWT < rrAvgWT ? "success" : "failure"}">${npAvgWT < rrAvgWT ? "✓" : "✗"}</span> Priority achieved lower average WT (${npAvgWT.toFixed(2)}) vs RR (${rrAvgWT.toFixed(2)}).</li>
-      <li><span class="icon ${npAvgRT < rrAvgRT ? "success" : "failure"}">${npAvgRT < rrAvgRT ? "✓" : "✗"}</span> Priority achieved lower average RT (${npAvgRT.toFixed(2)}) vs RR (${rrAvgRT.toFixed(2)}).</li>
-      <li><span class="icon ${urgencyAdvantage ? "success" : "failure"}">${urgencyAdvantage ? "✓" : "✗"}</span> Urgent processes gained significant advantage in Priority scheduling.</li>
-      <li><span class="icon ${rrSD < npSD ? "success" : "failure"}">${rrSD < npSD ? "✓" : "✗"}</span> RR appeared more balanced (TAT SD: ${rrSD.toFixed(2)}) vs Priority (${npSD.toFixed(2)}).</li>
-      <li><span class="icon ${npStarvation ? "failure" : "success"}">${npStarvation ? "✗" : "✓"}</span> ${npStarvation ? "Starvation risk observed in Priority scheduling." : "No significant starvation risk in Priority scheduling."}</li>
+      <li>Priority achieved lower average WT (${npAvgWT.toFixed(2)}) vs RR (${rrAvgWT.toFixed(2)}).</li>
+      <li>Priority achieved lower average RT (${npAvgRT.toFixed(2)}) vs RR (${rrAvgRT.toFixed(2)}).</li>
+      <li>Urgent processes gained significant advantage in Priority scheduling.</li>
+      <li>RR appeared more balanced (TAT SD: ${rrSD.toFixed(2)}) vs Priority (${npSD.toFixed(2)}).</li>
+      <li>${npStarvation ? "Starvation risk observed in Priority scheduling." : "No significant starvation risk in Priority scheduling."}</li>
     </ul>
-    <p><strong>Recommendation:</strong> ${npAvgWT < rrAvgWT ? "Priority Scheduling is recommended for lower overall wait time." : "Round Robin is recommended for better fairness and balanced service."}</p>
   `;
 
   conclusionCard.innerHTML = `
