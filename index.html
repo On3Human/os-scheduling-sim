@@ -9,11 +9,31 @@
   <body>
     <div class="container">
       <h1>CPU Scheduling Simulator</h1>
+      
+      <section id="scenario-section">
+        <h2>Scenario Selector</h2>
+        <div class="scenario-controls">
+          <select id="scenario-select">
+            <option value="">-- Select a Scenario --</option>
+            <option value="A">Scenario A : Basic Mixed Workload</option>
+            <option value="B">Scenario B :  Urgency Case</option>
+            <option value="C">Scenario C :  Fairness Case</option>
+            <option value="D">Scenario D :  Starvation Case</option>
+            <option value="E">Scenario E :  Validation Case</option>
+          </select>
+          <p id="scenario-description" class="description">Select a scenario to auto-populate the process table.</p>
+        </div>
+      </section>
+
       <section id="input-section">
         <h2>Process Input</h2>
+        <div class="info-box">
+          <p><strong>Priority Rule:</strong> Lower number = Higher priority.</p>
+          <p><strong>Tie-breaking:</strong> Arrival time (earlier arrives first), then PID (lower ID first).</p>
+        </div>
         <div class="quantum-container">
           <label for="quantum">Time Quantum (RR):</label>
-          <input type="number" id="quantum" min="1" value="2" />
+          <input type="number" id="quantum" min="1" value="3" />
         </div>
         <table id="process-table">
           <thead>
@@ -28,88 +48,86 @@
           <tbody id="process-body">
             <tr>
               <td><input type="text" class="p-id" value="P1" /></td>
-              <td><input type="number" class="p-at" min="0" value="0" /></td>
-              <td><input type="number" class="p-bt" min="1" value="5" /></td>
-              <td><input type="number" class="p-priority" value="1" /></td>
+              <td><input type="number" class="p-at" value="0" /></td>
+              <td><input type="number" class="p-bt" value="6" /></td>
+              <td><input type="number" class="p-priority" value="3" /></td>
               <td><button class="remove-row">Remove</button></td>
             </tr>
           </tbody>
         </table>
-        <button id="add-row">Add Process</button>
-        <button id="run-btn">Run Simulation</button>
+        <div class="button-group">
+          <button id="add-row">Add Process</button>
+          <button id="run-btn">Run Simulation</button>
+        </div>
         <div id="error-msg" class="error"></div>
       </section>
-      <section id="gantt-section">
-        <h2>Gantt Charts</h2>
-        <div class="chart-wrapper">
-          <h3>Round Robin</h3>
-          <canvas id="rr-canvas"></canvas>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Priority Scheduling (Preemptive)</h3>
-          <canvas id="ps-canvas"></canvas>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Priority Scheduling (Non-Preemptive)</h3>
-          <canvas id="np-canvas"></canvas>
-        </div>
-      </section>
-      <section id="results-section">
-        <h2>Results</h2>
-        <div class="results-container">
-          <div class="result-table-wrapper">
-            <h3>Round Robin Metrics</h3>
-            <table id="rr-result-table">
-              <thead>
-                <tr>
-                  <th>Process</th>
-                  <th>WT</th>
-                  <th>TAT</th>
-                  <th>RT</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+
+      <div id="results-area" style="display: none;">
+        <section id="gantt-section">
+          <h2>Gantt Charts</h2>
+          <div class="chart-wrapper">
+            <h3>Round Robin</h3>
+            <canvas id="rr-canvas"></canvas>
           </div>
-          <div class="result-table-wrapper">
-            <h3>Priority Scheduling (Preemptive) Metrics</h3>
-            <table id="ps-result-table">
-              <thead>
-                <tr>
-                  <th>Process</th>
-                  <th>WT</th>
-                  <th>TAT</th>
-                  <th>RT</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+          <div class="chart-wrapper">
+            <h3>Priority Scheduling (Non-Preemptive)</h3>
+            <canvas id="np-canvas"></canvas>
           </div>
-          <div class="result-table-wrapper">
-            <h3>Priority Scheduling (Non-Preemptive) Metrics</h3>
-            <table id="np-result-table">
-              <thead>
-                <tr>
-                  <th>Process</th>
-                  <th>WT</th>
-                  <th>TAT</th>
-                  <th>RT</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+        </section>
+
+        <section id="results-section">
+          <h2>Results</h2>
+          <div class="results-container">
+            <div class="result-table-wrapper">
+              <h3>Round Robin Metrics</h3>
+              <table id="rr-result-table">
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Priority</th>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>WT</th>
+                    <th>TAT</th>
+                    <th>RT</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="result-table-wrapper">
+              <h3>Priority Scheduling (Non-Preemptive) Metrics</h3>
+              <table id="np-result-table">
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Priority</th>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>WT</th>
+                    <th>TAT</th>
+                    <th>RT</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
-      <section id="comparison-section">
-        <h2>Comparison & Conclusion</h2>
-        <div id="comparison-text"></div>
-        <div id="conclusion-text"></div>
-      </section>
+        </section>
+
+        <section id="comparison-section">
+          <h2>Comparison & Conclusion</h2>
+          <div id="comparison-summary" class="summary-card"></div>
+          <div id="final-conclusion" class="conclusion-card"></div>
+        </section>
+      </div>
     </div>
     <script src="js/process.js"></script>
     <script src="js/roundRobin.js"></script>
-    <script src="js/priorityScheduler.js"></script>
     <script src="js/nonPreemptivePriority.js"></script>
     <script src="js/gantt.js"></script>
     <script src="js/ui.js"></script>
