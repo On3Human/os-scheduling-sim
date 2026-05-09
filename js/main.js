@@ -13,16 +13,19 @@ document.getElementById("run-btn").addEventListener("click", async function() {
   
   const rrResults = runRoundRobin(processes, quantum);
   const npResults = runNonPreemptivePriority(processes);
+  const pResults = runPriorityScheduler(processes);
   
-  displayResults(rrResults, npResults);
+  displayResults(rrResults, npResults, pResults);
   
   resizeCanvas("rr-canvas");
   resizeCanvas("np-canvas");
+  resizeCanvas("p-canvas");
   
   drawGantt("rr-canvas", rrResults.timeline);
   drawGantt("np-canvas", npResults.timeline);
+  drawGantt("p-canvas", pResults.timeline);
   
-  displayComparison(rrResults, npResults);
+  displayComparison(rrResults, npResults, pResults);
 
   btn.innerText = originalText;
   btn.disabled = false;
@@ -34,6 +37,7 @@ window.addEventListener("resize", () => {
   if (document.getElementById("results-area").style.display !== "none") {
     resizeCanvas("rr-canvas");
     resizeCanvas("np-canvas");
+    resizeCanvas("p-canvas");
   }
 });
 

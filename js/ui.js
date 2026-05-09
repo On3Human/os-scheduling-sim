@@ -178,10 +178,11 @@ function showError(msg) {
   errorMsg.appendChild(p);
 }
 
-function displayResults(rrData, npData) {
+function displayResults(rrData, npData, pData) {
   resultsArea.style.display = "block";
   fillResultTable("rr-result-table", rrData);
   fillResultTable("np-result-table", npData);
+  fillResultTable("p-result-table", pData);
 }
 
 function fillResultTable(tableId, data) {
@@ -237,15 +238,17 @@ function fillResultTable(tableId, data) {
   tbody.appendChild(footer);
 }
 
-function displayComparison(rr, np) {
+function displayComparison(rr, np, p) {
   const summaryCard = document.getElementById("comparison-summary");
   const conclusionCard = document.getElementById("final-conclusion");
   const n = rr.processes.length;
 
   const rrAvgWT = rr.processes.reduce((a, b) => a + b.wt, 0) / n;
   const npAvgWT = np.processes.reduce((a, b) => a + b.wt, 0) / n;
+  const pAvgWT = p.processes.reduce((a, b) => a + b.wt, 0) / n;
   const rrAvgRT = rr.processes.reduce((a, b) => a + b.rt, 0) / n;
   const npAvgRT = np.processes.reduce((a, b) => a + b.rt, 0) / n;
+  const pAvgRT = p.processes.reduce((a, b) => a + b.rt, 0) / n;
 
   const calcSD = (procs) => {
     const avgTAT = procs.reduce((a, b) => a + b.tat, 0) / n;
@@ -256,34 +259,47 @@ function displayComparison(rr, np) {
 
   const rrSD = calcSD(rr.processes);
   const npSD = calcSD(np.processes);
+  const pSD = calcSD(p.processes);
 
-  const npStarvation = np.processes.some((p) => {
-    const others = np.processes.filter((o) => o.id !== p.id);
+  const npStarvation = np.processes.some((pr) => {
+    const others = np.processes.filter((o) => o.id !== pr.id);
     const avgOthersWT = others.reduce((a, b) => a + b.wt, 0) / (n - 1);
-    return p.wt > 2 * avgOthersWT;
+    return pr.wt > 2 * avgOthersWT;
+  });
+
+  const pStarvation = p.processes.some((pr) => {
+    const others = p.processes.filter((o) => o.id !== pr.id);
+    const avgOthersWT = others.reduce((a, b) => a + b.wt, 0) / (n - 1);
+    return pr.wt > 2 * avgOthersWT;
   });
 
   const highestPriority = [...np.processes].sort(
     (a, b) => a.priority - b.priority,
   )[0];
-  const hpRR = rr.processes.find((p) => p.id === highestPriority.id);
+  const hpRR = rr.processes.find((pr) => pr.id === highestPriority.id);
+  const hpP = p.processes.find((pr) => pr.id === highestPriority.id);
   const urgencyAdvantage = highestPriority.rt < hpRR.rt;
+  const pUrgencyAdvantage = hpP.rt < hpRR.rt;
 
   summaryCard.innerHTML = `
     <ul>
-      <li>Priority achieved lower average WT (${npAvgWT.toFixed(2)}) vs RR (${rrAvgWT.toFixed(2)}).</li>
-      <li>Priority achieved lower average RT (${npAvgRT.toFixed(2)}) vs RR (${rrAvgRT.toFixed(2)}).</li>
+      <li>Avg WT: Preemptive (${pAvgWT.toFixed(2)}), Non-Preemptive (${npAvgWT.toFixed(2)}), RR (${rrAvgWT.toFixed(2)}).</li>
+      <li>Avg RT: Preemptive (${pAvgRT.toFixed(2)}), Non-Preemptive (${npAvgRT.toFixed(2)}), RR (${rrAvgRT.toFixed(2)}).</li>
       <li>Urgent processes gained significant advantage in Priority scheduling.</li>
-      <li>RR appeared more balanced (TAT SD: ${rrSD.toFixed(2)}) vs Priority (${npSD.toFixed(2)}).</li>
-      <li>${npStarvation ? "Starvation risk observed in Priority scheduling." : "No significant starvation risk in Priority scheduling."}</li>
+      <li>Fairness (TAT SD): RR (${rrSD.toFixed(2)}), Preemptive (${pSD.toFixed(2)}), Non-Preemptive (${npSD.toFixed(2)}).</li>
+      <li>Starvation risk: Non-Preemptive (${npStarvation ? "Yes" : "No"}), Preemptive (${pStarvation ? "Yes" : "No"}).</li>
     </ul>
   `;
 
+  let bestAvgWT = "Round Robin";
+  if (npAvgWT <= rrAvgWT && npAvgWT <= pAvgWT) bestAvgWT = "Non-Preemptive Priority";
+  if (pAvgWT <= rrAvgWT && pAvgWT < npAvgWT) bestAvgWT = "Preemptive Priority";
+
   conclusionCard.innerHTML = `
     <h3>Final Conclusion</h3>
-    <p>Overall, <strong>${npAvgWT < rrAvgWT ? "Priority Scheduling" : "Round Robin"}</strong> performed better on this dataset. 
-    Priority-based service ${urgencyAdvantage ? "successfully improved" : "did not significantly improve"} urgent-task treatment. 
-    Round Robin ${rrSD < npSD ? "provided" : "did not provide"} better fairness in this specific case. 
-    Starvation risk was ${npStarvation ? "present" : "minimal"} in the Priority algorithm.</p>
+    <p>Overall, <strong>${bestAvgWT}</strong> performed best for Average Waiting Time. 
+    Priority-based service ${urgencyAdvantage || pUrgencyAdvantage ? "successfully improved" : "did not significantly improve"} urgent-task treatment. 
+    Round Robin ${rrSD <= npSD && rrSD <= pSD ? "provided" : "did not provide"} better fairness in this specific case. 
+    Starvation risk was present in Priority algorithms if lower priority processes waited too long.</p>
   `;
 }

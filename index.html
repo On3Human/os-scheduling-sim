@@ -73,6 +73,10 @@
             <h3>Priority Scheduling (Non-Preemptive)</h3>
             <canvas id="np-canvas"></canvas>
           </div>
+          <div class="chart-wrapper">
+            <h3>Priority Scheduling (Preemptive)</h3>
+            <canvas id="p-canvas"></canvas>
+          </div>
         </section>
 
         <section id="results-section">
@@ -116,6 +120,25 @@
                 <tbody></tbody>
               </table>
             </div>
+            <div class="result-table-wrapper">
+              <h3>Priority Scheduling (Preemptive) Metrics</h3>
+              <table id="p-result-table">
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Priority</th>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>WT</th>
+                    <th>TAT</th>
+                    <th>RT</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -129,6 +152,7 @@
     <script src="js/process.js"></script>
     <script src="js/roundRobin.js"></script>
     <script src="js/nonPreemptivePriority.js"></script>
+    <script src="js/priorityScheduler.js"></script>
     <script src="js/gantt.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
