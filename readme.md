@@ -73,3 +73,15 @@ This is a client-side web application using HTML, CSS, and JavaScript. There are
 **Gantt Chart Output:**
 ![A Gant chart for fair workload](/screenshots/fair_gant.png)
 
+### Scenario D: Starvation Risk
+**Description:** One low-priority process competes with four high priority ones: starvation risk.
+- **Time Quantum:** 3
+- **Processes:**
+  - **P1:** Arrival Time = 0, Burst Time = 2, Priority = 1
+  - **P2:** Arrival Time = 0, Burst Time = 3, Priority = 1
+  - **P3:** Arrival Time = 0, Burst Time = 4, Priority = 1
+  - **P4:** Arrival Time = 0, Burst Time = 5, Priority = 1
+  - **P5:** Arrival Time = 0, Burst Time = 10, Priority = 5
+
+**Gantt Chart Output:**
+![A Gantt chart for starvation risk scenario](/screenshots/starvation_gant.png)
