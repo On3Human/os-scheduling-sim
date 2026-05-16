@@ -1,7 +1,8 @@
 # CPU Scheduling Simulator: Round Robin vs Priority
 
-## Project Description
-This project is a web-based CPU scheduling simulator that implements and compares two scheduling algorithms: Round Robin and Priority Scheduling. The main objective is to compare a scheduler that shares CPU time across ready processes (Round Robin) with a scheduler that favors more important processes according to priority. The simulator analyzes how urgency, fairness, starvation risk, and policy-driven service affect execution order and performance metrics.
+## Project Description And link
+This project is a web-based CPU scheduling simulator that implements and compares two scheduling algorithms: Round Robin and Priority Scheduling.
+- Link : https://os-scheduling-simulator-delta.vercel.app/
 
 ## Requirements
 - Accept a dynamic number of processes and all required process data at runtime.
